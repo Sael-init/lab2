@@ -2,21 +2,25 @@ from app import db
 from datetime import datetime
 
 class Calificacion(db.Model):
-    __tablename__ = 'calificaciones'
+    __tablename__ = 'calificacion'
     
-    id = db.Column(db.Integer, primary_key=True)
-    autor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    cochera_id = db.Column(db.Integer, db.ForeignKey('cocheras.id'), nullable=False)
-    puntuacion = db.Column(db.Integer, nullable=False)  # 1-5
-    comentario = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    id_calificacion = db.Column(db.Integer, primary_key=True)
+    puntuacion = db.Column(db.Integer, nullable=False)
+    comentario = db.Column(db.Text)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'))
+    id_cochera = db.Column(db.Integer, db.ForeignKey('cochera.id_cochera'))
+    
+    __table_args__ = (
+        db.CheckConstraint('puntuacion >= 1 AND puntuacion <= 5', name='check_puntuacion'),
+    )
     
     def to_dict(self):
         return {
-            'id': self.id,
-            'autor_id': self.autor_id,
-            'cochera_id': self.cochera_id,
+            'id_calificacion': self.id_calificacion,
             'puntuacion': self.puntuacion,
             'comentario': self.comentario,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'fecha': self.fecha.isoformat() if self.fecha else None,
+            'id_usuario': self.id_usuario,
+            'id_cochera': self.id_cochera
         }

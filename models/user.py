@@ -1,35 +1,27 @@
 from app import db, bcrypt
 from datetime import datetime
 
-class User(db.Model):
-    __tablename__ = 'users'
+class Usuario(db.Model):
+    __tablename__ = 'usuario'
     
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-    phone = db.Column(db.String(20), nullable=True)
-    user_type = db.Column(db.String(20), nullable=False)  # 'cliente' o 'owner'
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active = db.Column(db.Boolean, default=True)
+    id_usuario = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    apellido = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    telefono = db.Column(db.String(20))
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relaciones
-    cocheras = db.relationship('Cochera', backref='owner', lazy=True)
-    reservas = db.relationship('Reserva', backref='cliente', lazy=True)
-    calificaciones = db.relationship('Calificacion', backref='autor', lazy=True)
-    
-    def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-        
-    def check_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
+    reservas = db.relationship('Reserva', backref='usuario', lazy=True)
+    calificaciones = db.relationship('Calificacion', backref='usuario', lazy=True)
+    pagos = db.relationship('Pago', backref='usuario', lazy=True)
     
     def to_dict(self):
         return {
-            'id': self.id,
-            'username': self.username,
+            'id_usuario': self.id_usuario,
+            'nombre': self.nombre,
+            'apellido': self.apellido,
             'email': self.email,
-            'phone': self.phone,
-            'user_type': self.user_type,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'telefono': self.telefono,
+            'fecha_registro': self.fecha_registro.isoformat() if self.fecha_registro else None
         }

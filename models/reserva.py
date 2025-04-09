@@ -2,28 +2,25 @@ from app import db
 from datetime import datetime
 
 class Reserva(db.Model):
-    __tablename__ = 'reservas'
+    __tablename__ = 'reserva'
     
-    id = db.Column(db.Integer, primary_key=True)
-    cliente_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    cochera_id = db.Column(db.Integer, db.ForeignKey('cocheras.id'), nullable=False)
+    id_reserva = db.Column(db.Integer, primary_key=True)
     fecha_inicio = db.Column(db.DateTime, nullable=False)
     fecha_fin = db.Column(db.DateTime, nullable=False)
-    estado = db.Column(db.String(20), nullable=False, default='pendiente')  # pendiente, confirmado, cancelado, completado
-    monto_total = db.Column(db.Float, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    estado = db.Column(db.String(50), default='pendiente')
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id_usuario'))
+    id_cochera = db.Column(db.Integer, db.ForeignKey('cochera.id_cochera'))
     
-    # Relaciones
-    pago = db.relationship('Pago', backref='reserva', lazy=True, uselist=False, cascade="all, delete-orphan")
+    __table_args__ = (
+        db.CheckConstraint('fecha_fin > fecha_inicio', name='check_fechas'),
+    )
     
     def to_dict(self):
         return {
-            'id': self.id,
-            'cliente_id': self.cliente_id,
-            'cochera_id': self.cochera_id,
+            'id_reserva': self.id_reserva,
             'fecha_inicio': self.fecha_inicio.isoformat() if self.fecha_inicio else None,
             'fecha_fin': self.fecha_fin.isoformat() if self.fecha_fin else None,
             'estado': self.estado,
-            'monto_total': self.monto_total,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'id_usuario': self.id_usuario,
+            'id_cochera': self.id_cochera
         }
